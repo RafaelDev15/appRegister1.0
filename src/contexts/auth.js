@@ -8,7 +8,9 @@ export const AuthContext = createContext({});
 export default function AuthPorvider({children}){
 
     const [user, setUser] = useState(null);
-
+    const [loadingAuth, setLoadingAuth] = useState(false);
+    const [loading, setLoading] = useState(true);
+    
     useEffect(() => {
 
         async function loadStorage(){
@@ -16,7 +18,10 @@ export default function AuthPorvider({children}){
 
             if(storage){
                 setUser(JSON.parse(storage));
+                setLoading(false);
             }
+
+            setLoading(false);
         }
 
         loadStorage();
@@ -24,6 +29,8 @@ export default function AuthPorvider({children}){
     }, []);
 
     async function signIn(email, password){
+        setLoadingAuth(true);
+
         await api.post('/auth', {email, password})
         .then((res) => {
 
@@ -32,7 +39,12 @@ export default function AuthPorvider({children}){
             const TOKEN = res.data.token;
             setUser(USER);
             storage(USER);
+            setLoadingAuth(false);
 
+        })
+        .catch((err) => {
+            console.log(err);
+            setLoadingAuth(false);
         })
     }
 
@@ -68,7 +80,9 @@ export default function AuthPorvider({children}){
                 user,
                 signIn,
                 signUp,
-                logOut 
+                logOut,
+                loadingAuth,
+                loading
             }}
         >
             {children}

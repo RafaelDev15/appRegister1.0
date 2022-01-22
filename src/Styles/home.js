@@ -1,4 +1,4 @@
-import styled from 'styled-components/native';
+import styled, {keyframes, css} from 'styled-components/native';
 
 export const Container = styled.View`
     flex: 1;
@@ -11,6 +11,7 @@ export const SubHome = styled.View`
     width: 95%;
     height: 200px;
     border-radius: 10px;
+    margin-bottom: 20px;
 `;
 
 export const AreaRefister = styled.View`
@@ -31,7 +32,7 @@ export const AreaIcons = styled.View`
 `;
 
 export const AreaInfos = styled.View`
-    margin-top: 100px;
+    margin-left: 10px;
     background: #191A30;
     width: 95%;
     height: 60px;
@@ -41,6 +42,7 @@ export const AreaInfos = styled.View`
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 10px;
+    margin-bottom: 20px;
 `;
 
 export const Title = styled.Text`

@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useRef, useEffect} from 'react';
 
 import api from '../../server/api';
 import {AuthContext} from '../../contexts/auth';
@@ -11,8 +11,24 @@ export default function New() {
   const [assunto, setAssunto] = useState('');
   const [tipo, setTipo] = useState('Empresa');
   const [descricao, setDescricao] = useState('');
+  const [stateInput, setStateInput] = useState(false);
+
+  const inputRef = useRef(null);
 
   const {user} = useContext(AuthContext);
+
+  //Open keyBord when screen renders
+  useEffect(() => {
+
+     callInputRef();
+     
+     return () => callInputRef();
+
+  }, [])
+
+  const callInputRef = () => {
+    inputRef.current.focus();
+  }
 
   async function handleRegister(){
 
@@ -32,7 +48,12 @@ export default function New() {
 
     await api.post('/request', data)
     .then(() => {
-      console.log("Pedido cadastrado com sucesso");
+      alert("Pedido registrado com sucesso");
+      setAssunto('');
+      setTipo('');
+      setDescricao('');
+      inputRef.current.focus();
+      
     })
     .catch((err) => {
       console.log(err);
@@ -49,6 +70,7 @@ export default function New() {
               value={assunto}
               onChangeText={ text => setAssunto(text) }
               placeholder="Coloque o assunto do pedido"
+              ref={inputRef}
             />
 
             <Label>Tipo</Label>

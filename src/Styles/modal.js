@@ -77,11 +77,11 @@ export const ButtonStatus = styled.TouchableOpacity`
     justify-content: center;
     align-items: center;
     border-radius: 50px;
-    border: 2px solid #0EA501;
+    border: 2px solid ${props => (props.status ? '#0EA501' : '#FAFF00')};
 `;
 
 export const BtnStatus = styled.Text`
-    color: #0EA501;
+    color: ${props => (props.text ? '#0EA501' : '#FAFF00')};
     text-transform: uppercase;
     font-weight: bold;
 `;

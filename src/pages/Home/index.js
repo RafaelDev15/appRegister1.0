@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
-import {Modal} from 'react-native';
+import React, {useEffect, useState, useContext, useCallback} from 'react';
+import {Modal, FlatList, RefreshControl, Button, ActivityIndicator} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {AuthContext} from '../../contexts/auth';
 
-import Detalhes from '../../components/Detalhes';
 import Header from '../../components/Header';
+import Requests from '../../components/Requests';
+import Loading from '../../components/Loading';
 
 import { 
     Container, 
@@ -19,13 +21,56 @@ import {
     TextIcon ,
     ButtonInfos
 } from '../../Styles/home';
+import api from '../../server/api';
 
 export default function Home() {
 
-    const [showModal, setShowModal] = useState(false);
+    const [requests, setRequests] = useState([]);
 
-    function handleCloseModal(){
-        setShowModal(!false)
+    const [refreshing, setRefreshing] = useState(false);
+    const [loadingList, setLoadingList] = useState(false);
+
+    const {user} = useContext(AuthContext);
+
+    useEffect(() => {
+
+        loadRequests();
+
+       /* async function loadRequests(){
+
+            await api.get(`/request/${user && user._id}`)
+            .then((res) => {
+                setRequests(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+
+        loadRequests();*/
+       
+    }, []);
+
+    //Calling data from API user
+    async function loadRequests(){
+        setLoadingList(true);
+        await api.get(`/request/${user && user._id}`)
+        .then((res) => {
+            setRequests(res.data);
+            setRefreshing(false);
+            setLoadingList(false);
+        })
+        .catch((err) => {
+            console.log(err);
+            setRefreshing(false);
+            setLoadingList(false);
+        })
+    }
+
+    //Function that updates array data
+    const handleRefresh = () => {
+        setRefreshing(true);
+        loadRequests();
     }
 
     const navigation = useNavigation();
@@ -38,7 +83,7 @@ export default function Home() {
        <SubHome>
            <AreaRefister>
                 <TextRegister style={{fontStyle: 'italic'}}>Pedidos registrados</TextRegister>
-                <TextRegister>N° 50</TextRegister>
+                <TextRegister>N° {requests.length} </TextRegister>
            </AreaRefister>
 
            <AreaIcons>
@@ -55,20 +100,18 @@ export default function Home() {
 
            </AreaIcons>
        </SubHome>
-
-       <AreaInfos>
-            <ButtonInfos onPress={handleCloseModal}>
-                <Title>Suporte tecnico</Title>
-                <Icon name="circle" size={25} color='#0EA510' />
-            </ButtonInfos>
-           
-       </AreaInfos>
-
-       {showModal && (
-           <Modal>
-               <Detalhes close={ () => setShowModal(false) } />
-           </Modal>
-       )}
+         
+       <FlatList 
+        keyExtractor={item => item._id}
+        data={requests}
+        renderItem={ ({item}) => <Requests data={item} /> }
+        refreshControl={
+           <RefreshControl 
+            refreshing={refreshing}
+            onRefresh={handleRefresh}   
+           />
+       }
+       />
 
    </Container>
   );
